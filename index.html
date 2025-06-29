@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WNR Script Generator (Live)</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+    label { display: block; margin-top: 20px; }
+    input[type='range'], textarea, select, input[type='text'] {
+      width: 100%; padding: 8px; margin-top: 4px;
+    }
+    textarea { height: 320px; font-family: monospace; }
+    button { margin-top: 20px; padding: 10px 20px; }
+  </style>
+</head>
+<body>
+  <h1>WNR Alabama 205 – Live Script Generator</h1>
+
+  <label>Topic:
+    <input type="text" id="topic" placeholder="e.g., goat mayor scandal" />
+  </label>
+
+  <label>Humor: <span id="humorVal">0.5</span>
+    <input type="range" id="humor" min="0" max="1" step="0.1" value="0.5" oninput="humorVal.innerText = this.value" />
+  </label>
+
+  <label>Absurdity: <span id="absurdityVal">0.5</span>
+    <input type="range" id="absurdity" min="0" max="1" step="0.1" value="0.5" oninput="absurdityVal.innerText = this.value" />
+  </label>
+
+  <label>Investigative: <span id="investigativeVal">0.5</span>
+    <input type="range" id="investigative" min="0" max="1" step="0.1" value="0.5" oninput="investigativeVal.innerText = this.value" />
+  </label>
+
+  <label>Inject Lore Flavor:
+    <select id="loreFlavor">
+      <option value="none">None</option>
+      <option value="past">Reference Past Broadcast</option>
+      <option value="station000">Station 000 Breakthrough</option>
+      <option value="paranormal">Paranormal Activity</option>
+      <option value="chaos">Sudden Chaos</option>
+    </select>
+  </label>
+
+  <button onclick="generateScript()">Generate Script</button>
+
+  <textarea id="output" readonly placeholder="Generated script will appear here..."></textarea>
+
+  <script>
+    async function generateScript() {
+      const topic = document.getElementById("topic").value || "unlicensed preacher rodeo";
+      const humor = parseFloat(document.getElementById("humor").value);
+      const absurdity = parseFloat(document.getElementById("absurdity").value);
+      const investigative = parseFloat(document.getElementById("investigative").value);
+      const lore = document.getElementById("loreFlavor").value;
+      const loreArray = lore === "none" ? [] : [lore];
+
+      const payload = {
+        station: "AL205",
+        topic: topic,
+        humor: humor,
+        absurdity: absurdity,
+        investigative: investigative,
+        lore: loreArray
+      };
+
+      document.getElementById("output").value = "Generating script...";
+
+      try {
+        const response = await fetch("https://wnr-script-api.onrender.com/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        document.getElementById("output").value = data.script || "No script returned.";
+      } catch (err) {
+        document.getElementById("output").value = "Error contacting script generator.";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
