@@ -2,7 +2,9 @@ from flask import Flask, request, jsonify
 import openai
 import json
 import os
-
+@app.route("/")
+def index():
+    return "WNR Script API is live."
 app = Flask(__name__)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
