@@ -11,12 +11,15 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/")
 def home():
-    return "WNR Script API with OpenAI and CORS is live."
+    return "WNR Script API with OpenAI + debug logging is live."
 
 @app.route("/generate", methods=["POST"])
 def generate():
+    print(">>> /generate hit")
     try:
         data = request.json
+        print("Payload received:", data)
+
         station_id = data.get("station")
         topic = data.get("topic")
         tone = {
@@ -54,6 +57,8 @@ Script format should include:
 Each section should be 2–4 paragraphs and reflect character voice and tone settings.
 """
 
+        print("Prompt to OpenAI:", prompt[:400] + "...")  # Trim for logs
+
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
@@ -64,13 +69,16 @@ Each section should be 2–4 paragraphs and reflect character voice and tone set
             max_tokens=1600
         )
 
+        script = response['choices'][0]['message']['content']
+        print("OpenAI responded successfully. Returning script.")
+
         return jsonify({
             "station": station_id,
-            "script": response['choices'][0]['message']['content']
+            "script": script
         })
 
     except Exception as e:
-        print("ERROR:", str(e))
+        print("ERROR during /generate:", str(e))
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
