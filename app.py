@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import os
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/")
 def home():
-    return "WNR Script API is running in debug mode."
+    return "WNR Script API is running in debug mode with CORS enabled."
 
 @app.route("/generate", methods=["POST"])
 def generate():
